@@ -487,7 +487,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
     panel.style.display = 'block';
     panel.scrollIntoView({behavior:'smooth', block:'nearest'});
 
-    fetch('/api/claude', {
+    fetch('/.netlify/functions/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -566,7 +566,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
       'Return a JSON array only. No explanation, no markdown. Each object:\n' +
       '{"company":"string","type":"Importer|Exporter|Both","industry":"string","country":"string","lane":"string e.g. Lagos to Rotterdam","score":75,"volume":"Low|Medium|High","contact_title":"string","qualifier":"string 2 sentences","pain_point":"string","outreach_angle":"string","linkedin_search":"string"}';
 
-    fetch('/api/claude', {
+    fetch('/.netlify/functions/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
