@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnePort 365 — Sales Prospecting Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f6f3;--surface:#fff;--surface2:#f2f1ee;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+  --text:#1a1917;--text2:#6b6a67;--text3:#9a9895;
+  --teal:#0f6e56;--teal-l:#e1f5ee;--teal-m:#5dcaa5;
+  --amber:#ba7517;--amber-l:#faeeda;
+  --red-l:#fcebeb;--red:#a32d2d;
+  --green-l:#eaf3de;--green:#3b6d11;
+  --blue-l:#e6f1fb;--blue:#185fa5;
+  --purple-l:#eeedfe;--purple:#534ab7;
+  --r:10px;--rs:6px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* topbar */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--text);text-decoration:none}
+.logo-mark{width:28px;height:28px;background:var(--teal);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:16px;height:16px;fill:#fff}
+.topbar-right{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
+.week-pill{background:var(--purple-l);color:var(--purple);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:500}
+
+/* layout */
+.main{max-width:880px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.page-title{font-size:22px;font-weight:600;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:1.75rem}
+
+/* ICP */
+.icp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.icp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:14px}
+.icp-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:14px}
+.field-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;color:var(--text2);user-select:none;transition:all .1s;font-weight:500}
+.chip:hover{border-color:var(--teal-m);color:var(--teal)}
+.chip.on{background:var(--teal-l);color:var(--teal);border-color:var(--teal-m)}
+.chip.amber.on{background:var(--amber-l);color:var(--amber);border-color:#ef9f27}
+
+/* api key */
+.api-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.api-row label{font-size:12px;color:var(--text2);white-space:nowrap;font-weight:500}
+.api-row input{flex:1;padding:7px 11px;border:1px solid var(--border2);border-radius:var(--rs);font-size:13px;font-family:monospace;background:var(--surface2);color:var(--text);outline:none}
+.api-row input:focus{border-color:var(--teal-m);background:var(--surface)}
+.api-note{font-size:11px;color:var(--text3);margin-top:5px}
+.api-note a{color:var(--blue)}
+
+/* run btn */
+.run-btn{width:100%;padding:13px 20px;font-size:14px;font-weight:600;background:var(--teal);color:#fff;border:none;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin:1.25rem 0;transition:background .15s,opacity .15s}
+.run-btn:hover{background:#0d5c47}
+.run-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* status */
+.sbar{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;font-size:13px;color:var(--text2);display:none;align-items:center;gap:10px;margin-bottom:1rem}
+.sbar.show{display:flex}
+.sbar.error{background:var(--red-l);color:var(--red);border-color:#f09595}
+.spin{width:15px;height:15px;border:2px solid #ccc;border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* metrics */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.metric .ml{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.metric .mv{font-size:26px;font-weight:600;line-height:1}
+
+/* toolbar */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:10px;flex-wrap:wrap}
+.filter-row{display:flex;gap:5px;flex-wrap:wrap}
+.fbtn{font-size:12px;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;color:var(--text2);font-weight:500;transition:all .1s}
+.fbtn:hover,.fbtn.active{background:var(--text);color:var(--surface);border-color:var(--text)}
+.icon-btn{font-size:12px;padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface);cursor:pointer;color:var(--text2);font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:all .1s}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+.icon-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* cards */
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.125rem 1.375rem;margin-bottom:10px;transition:border-color .15s}
+.pcard.starred{border-color:#ef9f27}
+.pcard-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.pcard-title{font-size:15px;font-weight:600}
+.pcard-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.score-pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0}
+.s-high{background:var(--green-l);color:var(--green)}
+.s-med{background:var(--amber-l);color:var(--amber)}
+.s-low{background:var(--red-l);color:var(--red)}
+.pcard-body{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);line-height:1.65}
+.meta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;font-size:12px}
+.meta-item{display:flex;align-items:center;gap:5px;color:var(--text2)}
+.meta-item svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.vol-pill{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500}
+.vol-h{background:var(--green-l);color:var(--green)}
+.vol-m{background:var(--amber-l);color:var(--amber)}
+.vol-l{background:var(--surface2);color:var(--text3)}
+.qualifier{margin-bottom:10px;color:var(--text)}
+.insight-box{background:var(--surface2);border-radius:var(--rs);padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--text2);line-height:1.6}
+.insight-box strong{color:var(--text)}
+.linkedin-row{font-size:12px;color:var(--text3);margin-bottom:10px}
+.linkedin-row em{color:var(--blue);font-style:normal}
+.stage-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.stage-label{font-size:12px;color:var(--text3);font-weight:500}
+.stage-select{font-size:12px;padding:4px 8px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;outline:none}
+.sbadge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;vertical-align:middle;margin-left:8px}
+.sb-new{background:var(--blue-l);color:var(--blue)}
+.sb-contacted{background:var(--amber-l);color:var(--amber)}
+.sb-qualified{background:var(--green-l);color:var(--green)}
+.sb-quoted{background:var(--purple-l);color:var(--purple)}
+.sb-closed{background:var(--red-l);color:var(--red)}
+.pcard-actions{display:flex;gap:6px;flex-wrap:wrap}
+.actn{font-size:12px;padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface);cursor:pointer;color:var(--text2);font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:all .1s}
+.actn:hover{background:var(--surface2);color:var(--text)}
+.actn.star-on{background:var(--amber-l);color:var(--amber);border-color:#ef9f27}
+.actn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* result panel */
+.result-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-top:1.5rem;display:none}
+.result-panel h3{font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.result-panel pre{font-family:'Inter',sans-serif;font-size:13px;color:var(--text2);white-space:pre-wrap;line-height:1.7}
+.copy-btn{font-size:12px;padding:5px 11px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface2);cursor:pointer;color:var(--text2);font-weight:500}
+.copy-btn:hover{background:var(--bg)}
+
+/* empty */
+.empty{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:12px}
+.empty h3{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.empty p{font-size:13px}
+
+@media(max-width:640px){
+  .icp-grid,.icp-grid3,.metrics{grid-template-columns:1fr}
+  .topbar{padding:0 1rem}
+  .main{padding:1.25rem 1rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M8 1L2 4v4c0 3.3 2.5 6.4 6 7 3.5-.6 6-3.7 6-7V4L8 1z"/></svg>
+    </div>
+    OnePort 365
+  </a>
+  <div class="topbar-right">
+    <span>Sales prospecting agent</span>
+    <span class="week-pill" id="week-pill">—</span>
+  </div>
+</header>
+
+<main class="main">
+  <h1 class="page-title">Weekly prospect list</h1>
+  <p class="page-sub">Configure your ICP, add your Anthropic API key, then run the agent to generate this week's qualified importers and exporters.</p>
+
+  <section class="icp-section">
+    <h2 style="font-size:13px;font-weight:600;margin-bottom:16px">ICP configuration</h2>
+
+    <div class="icp-grid">
+      <div>
+        <div class="field-label">Trade corridors</div>
+        <div class="chip-row" id="corridors">
+          <span class="chip on" data-v="Nigeria">Nigeria</span>
+          <span class="chip on" data-v="Kenya">Kenya</span>
+          <span class="chip on" data-v="Ghana">Ghana</span>
+          <span class="chip" data-v="South Africa">South Africa</span>
+          <span class="chip" data-v="Ethiopia">Ethiopia</span>
+          <span class="chip" data-v="Egypt">Egypt</span>
+          <span class="chip" data-v="Cameroon">Cameroon</span>
+          <span class="chip" data-v="Tanzania">Tanzania</span>
+          <span class="chip" data-v="Cote dIvoire">Côte d'Ivoire</span>
+          <span class="chip" data-v="Senegal">Senegal</span>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Cargo type</div>
+        <div class="chip-row" id="cargo">
+          <span class="chip amber on" data-v="FCL Ocean">FCL Ocean</span>
+          <span class="chip amber" data-v="LCL Ocean">LCL Ocean</span>
+          <span class="chip amber" data-v="Air Freight">Air Freight</span>
+          <span class="chip amber" data-v="Inland Road">Inland</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="icp-grid3">
+      <div>
+        <div class="field-label">Prospect type</div>
+        <div class="chip-row single" id="ptype">
+          <span class="chip on" data-v="Importers">Importers</span>
+          <span class="chip on" data-v="Exporters">Exporters</span>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Company size</div>
+        <div class="chip-row single" id="csize">
+          <span class="chip" data-v="SME 10 to 200 staff">SME</span>
+          <span class="chip on" data-v="mid-market 200 to 1000 staff">Mid-market</span>
+          <span class="chip" data-v="enterprise 1000 plus staff">Enterprise</span>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Prospects per run</div>
+        <div class="chip-row single" id="pcount">
+          <span class="chip" data-v="5">5</span>
+          <span class="chip on" data-v="8">8</span>
+          <span class="chip" data-v="12">12</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="field-label">Industry focus</div>
+      <div class="chip-row" id="industry">
+        <span class="chip on" data-v="FMCG">FMCG</span>
+        <span class="chip on" data-v="Manufacturing">Manufacturing</span>
+        <span class="chip on" data-v="Retail and Distribution">Retail</span>
+        <span class="chip" data-v="Agri-commodities and Food">Agri</span>
+        <span class="chip" data-v="Construction and Building Materials">Construction</span>
+        <span class="chip" data-v="Pharmaceuticals">Pharma</span>
+        <span class="chip" data-v="Automotive parts">Auto</span>
+        <span class="chip" data-v="Oil and Gas">Oil &amp; Gas</span>
+        <span class="chip" data-v="Textiles and Apparel">Textiles</span>
+        <span class="chip" data-v="Mining and Minerals">Mining</span>
+      </div>
+    </div>
+
+
+  </section>
+
+  <button class="run-btn" id="runbtn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Generate this week's prospect list
+  </button>
+
+  <div class="sbar" id="sbar">
+    <div class="spin"></div>
+    <span id="sbar-msg">Searching…</span>
+  </div>
+
+  <div id="results" style="display:none">
+    <div class="metrics">
+      <div class="metric"><div class="ml">Prospects</div><div class="mv" id="m-total">0</div></div>
+      <div class="metric"><div class="ml">High priority</div><div class="mv" id="m-high">0</div></div>
+      <div class="metric"><div class="ml">Starred</div><div class="mv" id="m-star">0</div></div>
+      <div class="metric"><div class="ml">Avg score</div><div class="mv" id="m-avg">—</div></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-row" id="filters">
+        <button class="fbtn active" data-filter="all">All</button>
+        <button class="fbtn" data-filter="high">High priority</button>
+        <button class="fbtn" data-filter="starred">Starred</button>
+        <button class="fbtn" data-filter="new">New</button>
+        <button class="fbtn" data-filter="contacted">Contacted</button>
+      </div>
+      <button class="icon-btn" id="export-btn">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
+
+    <div id="plist"></div>
+  </div>
+
+  <div class="empty" id="empty-state">
+    <div class="empty-icon">📡</div>
+    <h3>No prospects yet</h3>
+    <p>Configure your ICP above and run the agent.</p>
+  </div>
+
+  <div class="result-panel" id="result-panel">
+    <h3>
+      <span id="result-label">Result</span>
+      <button class="copy-btn" id="copy-btn">Copy</button>
+    </h3>
+    <pre id="result-body"></pre>
+  </div>
+</main>
+
+<script>
+(function() {
+  // ── State ──
+  var prospects = [];
+  var activeFilter = 'all';
+  var STAGES = ['New','Contacted','Qualified','Quoted','Closed lost'];
+  var STAGE_CLASS = {'New':'sb-new','Contacted':'sb-contacted','Qualified':'sb-qualified','Quoted':'sb-quoted','Closed lost':'sb-closed'};
+
+  // ── Week label ──
+  function weekLabel() {
+    var now = new Date();
+    var mon = new Date(now);
+    mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    var sun = new Date(mon);
+    sun.setDate(mon.getDate() + 6);
+    var fmt = function(d) { return d.toLocaleDateString('en-GB', {day:'numeric', month:'short'}); };
+    return fmt(mon) + ' – ' + fmt(sun);
+  }
+  document.getElementById('week-pill').textContent = weekLabel();
+
+  // ── Chip toggle ──
+  document.querySelectorAll('.chip-row').forEach(function(row) {
+    var isSingle = row.id === 'csize' || row.id === 'pcount';
+    row.querySelectorAll('.chip').forEach(function(c) {
+      c.addEventListener('click', function() {
+        if (isSingle) {
+          row.querySelectorAll('.chip').forEach(function(x) { x.classList.remove('on'); });
+        }
+        c.classList.toggle('on');
+      });
+    });
+  });
+
+  // ── Filter buttons ──
+  document.getElementById('filters').addEventListener('click', function(e) {
+    var btn = e.target.closest('.fbtn');
+    if (!btn) return;
+    activeFilter = btn.dataset.filter;
+    document.querySelectorAll('.fbtn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderList();
+  });
+
+  // ── Run button ──
+  document.getElementById('runbtn').addEventListener('click', runAgent);
+
+  // ── Export button ──
+  document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+  // ── Copy button ──
+  document.getElementById('copy-btn').addEventListener('click', function() {
+    var text = document.getElementById('result-body').textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+  });
+
+  // ── Delegated clicks on prospect list ──
+  document.getElementById('plist').addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    var action = btn.dataset.action;
+    var id = parseInt(btn.dataset.id);
+    var p = prospects.find(function(x) { return x.id === id; });
+    if (!p) return;
+    if (action === 'star') { toggleStar(id); }
+    else if (action === 'research') { doResearch(p); }
+    else if (action === 'email') { doEmail(p); }
+    else if (action === 'call') { doCallScript(p); }
+  });
+
+  // ── Delegated change on stage selects ──
+  document.getElementById('plist').addEventListener('change', function(e) {
+    var sel = e.target.closest('.stage-select');
+    if (!sel) return;
+    var id = parseInt(sel.dataset.id);
+    var p = prospects.find(function(x) { return x.id === id; });
+    if (p) { p.stage = sel.value; renderList(); }
+  });
+
+  // ── Helpers ──
+  function chips(id) {
+    return Array.from(document.querySelectorAll('#' + id + ' .chip.on')).map(function(c) { return c.dataset.v; });
+  }
+
+  function setStatus(msg, isError) {
+    var b = document.getElementById('sbar');
+    b.className = 'sbar show' + (isError ? ' error' : '');
+    document.getElementById('sbar-msg').textContent = msg;
+  }
+
+  function hideStatus() {
+    document.getElementById('sbar').className = 'sbar';
+  }
+
+  function updateMetrics() {
+    document.getElementById('m-total').textContent = prospects.length;
+    document.getElementById('m-high').textContent = prospects.filter(function(p) { return p.score >= 75; }).length;
+    document.getElementById('m-star').textContent = prospects.filter(function(p) { return p.starred; }).length;
+    var avg = prospects.length ? Math.round(prospects.reduce(function(s,p) { return s + p.score; }, 0) / prospects.length) : 0;
+    document.getElementById('m-avg').textContent = avg + '%';
+  }
+
+  function filteredProspects() {
+    if (activeFilter === 'high')      return prospects.filter(function(p) { return p.score >= 75; });
+    if (activeFilter === 'starred')   return prospects.filter(function(p) { return p.starred; });
+    if (activeFilter === 'new')       return prospects.filter(function(p) { return p.stage === 'New'; });
+    if (activeFilter === 'contacted') return prospects.filter(function(p) { return p.stage === 'Contacted'; });
+    return prospects;
+  }
+
+  function safeHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ── Render prospect list ──
+  function renderList() {
+    var list = document.getElementById('plist');
+    var shown = filteredProspects();
+    if (!shown.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><h3>No matches</h3><p>Try a different filter.</p></div>';
+      return;
+    }
+    var html = shown.map(function(p) {
+      var sc  = p.score >= 75 ? 's-high' : p.score >= 55 ? 's-med' : 's-low';
+      var sl  = p.score >= 75 ? 'High priority' : p.score >= 55 ? 'Medium' : 'Low fit';
+      var vc  = p.volume === 'High' ? 'vol-h' : p.volume === 'Medium' ? 'vol-m' : 'vol-l';
+      var sb  = STAGE_CLASS[p.stage] || 'sb-new';
+      var starClass = 'actn' + (p.starred ? ' star-on' : '');
+      var starLabel = p.starred ? 'Starred' : 'Star';
+      var starFill  = p.starred ? ' style="fill:currentColor"' : '';
+      var stageOpts = STAGES.map(function(s) {
+        return '<option value="' + s + '"' + (p.stage === s ? ' selected' : '') + '>' + s + '</option>';
+      }).join('');
+      return '<article class="pcard' + (p.starred ? ' starred' : '') + '" id="pc-' + p.id + '">' +
+        '<div class="pcard-header">' +
+          '<div>' +
+            '<div class="pcard-title">' + safeHtml(p.company) + '<span class="sbadge ' + sb + '">' + safeHtml(p.stage) + '</span></div>' +
+            '<div class="pcard-sub">' + safeHtml(p.type) + ' · ' + safeHtml(p.industry) + ' · ' + safeHtml(p.country) + '</div>' +
+          '</div>' +
+          '<span class="score-pill ' + sc + '">' + sl + ' · ' + p.score + '%</span>' +
+        '</div>' +
+        '<div class="pcard-body">' +
+          '<div class="meta-row">' +
+            '<span class="meta-item"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' + safeHtml(p.lane) + '</span>' +
+            '<span class="vol-pill ' + vc + '">' + safeHtml(p.volume) + ' volume</span>' +
+            '<span class="meta-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' + safeHtml(p.contact_title) + '</span>' +
+          '</div>' +
+          '<p class="qualifier">' + safeHtml(p.qualifier) + '</p>' +
+          '<div class="insight-box"><strong>Pain point:</strong> ' + safeHtml(p.pain_point) + '<br><strong>Pitch angle:</strong> ' + safeHtml(p.outreach_angle) + '</div>' +
+          '<div class="linkedin-row">LinkedIn: <em>' + safeHtml(p.linkedin_search) + '</em></div>' +
+          '<div class="stage-row">' +
+            '<span class="stage-label">Stage:</span>' +
+            '<select class="stage-select" data-id="' + p.id + '">' + stageOpts + '</select>' +
+          '</div>' +
+          '<div class="pcard-actions">' +
+            '<button class="' + starClass + '" data-action="star" data-id="' + p.id + '">' +
+              '<svg viewBox="0 0 24 24"' + starFill + '><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' + starLabel +
+            '</button>' +
+            '<button class="actn" data-action="research" data-id="' + p.id + '"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Research</button>' +
+            '<button class="actn" data-action="email" data-id="' + p.id + '"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Draft email</button>' +
+            '<button class="actn" data-action="call" data-id="' + p.id + '"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.82 19.79 19.79 0 01.01 4.19a2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.06 6.06l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2z"/></svg>Call script</button>' +
+          '</div>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+    list.innerHTML = html;
+  }
+
+  // ── Toggle star ──
+  function toggleStar(id) {
+    var p = prospects.find(function(x) { return x.id === id; });
+    if (p) { p.starred = !p.starred; updateMetrics(); renderList(); }
+  }
+
+  // ── Export CSV ──
+  function exportCSV() {
+    if (!prospects.length) return;
+    var headers = ['Company','Type','Industry','Country','Lane','Volume','Score','Stage','Starred','Contact Title','Qualifier','Pain Point','Outreach Angle','LinkedIn Search'];
+    var rows = prospects.map(function(p) {
+      return [p.company,p.type,p.industry,p.country,p.lane,p.volume,p.score,p.stage,p.starred?'Yes':'No',p.contact_title,p.qualifier,p.pain_point,p.outreach_angle,p.linkedin_search]
+        .map(function(v) { return '"' + String(v||'').replace(/"/g,'""') + '"'; });
+    });
+    var csv = [headers.join(',')].concat(rows.map(function(r){ return r.join(','); })).join('\n');
+    var blob = new Blob([csv], {type:'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'oneport-prospects-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Anthropic API call ──
+  function callClaude(prompt, label) {
+    var panel = document.getElementById('result-panel');
+    var body  = document.getElementById('result-body');
+    document.getElementById('result-label').textContent = label;
+    body.textContent = 'Generating…';
+    panel.style.display = 'block';
+    panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+    fetch('/.netlify/functions/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1500,
+        messages: [{role:'user', content:prompt}]
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.error) { body.textContent = 'Error: ' + data.error.message; return; }
+      var text = (data.content || []).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
+      body.textContent = text || 'No response returned.';
+    })
+    .catch(function(err) {
+      body.textContent = 'Network error: ' + err.message;
+    });
+  }
+
+  // ── Action handlers ──
+  function doResearch(p) {
+    callClaude(
+      'You are a B2B freight sales researcher for OnePort 365.\n\nResearch this prospect:\nCompany: ' + p.company + '\nTrade lane: ' + p.lane + '\nIndustry: ' + p.industry + '\nTarget contact: ' + p.contact_title + '\n\nProvide:\n1. Company overview and likely freight volumes\n2. Who their current freight forwarder is likely to be\n3. Three specific pain points we can reference\n4. A hyper-personalised cold email with subject line\n5. One risk or objection to prepare for',
+      'Research: ' + p.company
+    );
+  }
+
+  function doEmail(p) {
+    callClaude(
+      'Write a cold outreach email for OnePort 365 to send to the ' + p.contact_title + ' at ' + p.company + '.\n\nOpening angle: ' + p.outreach_angle + '\nPain point: ' + p.pain_point + '\n\nRequirements:\n- Max 5 sentences in the body\n- No buzzwords or fluff\n- Reference OnePort\'s African corridor expertise and digital freight platform\n- End with a clear ask for a 20-minute call\n- Write 3 subject line options\n\nFormat: subject lines first, then email body.',
+      'Email draft: ' + p.company
+    );
+  }
+
+  function doCallScript(p) {
+    callClaude(
+      'Write a 60-second cold call opening script for an OnePort 365 sales rep calling the ' + p.contact_title + ' at ' + p.company + '.\n\nOpening hook: ' + p.outreach_angle + '\n\nInclude:\n1. Opening line (10 seconds)\n2. Value pitch (20 seconds)\n3. One qualifying question\n4. How to handle: "we already have a freight forwarder"\n5. Ask to book a follow-up meeting\n\nKeep it natural and conversational.',
+      'Call script: ' + p.company
+    );
+  }
+
+  // ── Main agent run ──
+  function runAgent() {
+    var corridors = chips('corridors');
+    var cargo     = chips('cargo');
+    var ptype     = chips('ptype');
+    var csize     = chips('csize');
+    var industry  = chips('industry');
+    var pcount    = chips('pcount')[0] || '8';
+
+    if (!corridors.length) { alert('Select at least one trade corridor.'); return; }
+    if (!cargo.length)     { alert('Select at least one cargo type.'); return; }
+    if (!ptype.length)     { alert('Select importer, exporter, or both.'); return; }
+
+    var btn = document.getElementById('runbtn');
+    btn.disabled = true;
+    btn.textContent = 'Running…';
+
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('result-panel').style.display = 'none';
+    setStatus('Searching for ' + ptype.join(' & ').toLowerCase() + ' across ' + corridors.join(', ') + '…');
+
+    var prompt = 'You are a B2B freight sales intelligence agent for OnePort 365, a digital freight forwarding platform specialising in African trade corridors.\n\n' +
+      'Generate exactly ' + pcount + ' qualified prospect companies for the OnePort 365 sales team.\n\n' +
+      'ICP:\n' +
+      '- Trade corridors: ' + corridors.join(', ') + '\n' +
+      '- Cargo: ' + cargo.join(', ') + '\n' +
+      '- Prospect types: ' + ptype.join(' and ') + '\n' +
+      '- Company size: ' + (csize[0] || 'mid-market') + '\n' +
+      '- Industries: ' + (industry.length ? industry.join(', ') : 'any') + '\n\n' +
+      'Rules:\n' +
+      '- Use specific plausible company names for African trade markets\n' +
+      '- Vary corridors, industries and volumes across results\n' +
+      '- Score honestly between 55 and 92\n\n' +
+      'Return a JSON array only. No explanation, no markdown. Each object:\n' +
+      '{"company":"string","type":"Importer|Exporter|Both","industry":"string","country":"string","lane":"string e.g. Lagos to Rotterdam","score":75,"volume":"Low|Medium|High","contact_title":"string","qualifier":"string 2 sentences","pain_point":"string","outreach_angle":"string","linkedin_search":"string"}';
+
+    fetch('/.netlify/functions/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4000,
+        messages: [{role:'user', content: prompt}]
+      })
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        return res.json().then(function(e) {
+          throw new Error(e.error && e.error.message ? e.error.message : 'HTTP ' + res.status);
+        });
+      }
+      return res.json();
+    })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error.message);
+
+      var raw = (data.content || [])
+        .filter(function(b){ return b.type === 'text'; })
+        .map(function(b){ return b.text; })
+        .join('');
+
+      if (!raw.trim()) throw new Error('No response returned. Please try again.');
+
+      // Strip markdown fences, find the JSON array
+      var cleaned = raw.replace(/```json|```/gi, '').trim();
+      var start = cleaned.indexOf('[');
+      var end   = cleaned.lastIndexOf(']');
+      if (start === -1 || end === -1) {
+        console.error('Raw Claude response:', raw);
+        throw new Error('Response did not contain a JSON array. Check browser console (F12) for raw output.');
+      }
+      var jsonStr = cleaned.slice(start, end + 1);
+
+      var parsed;
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch(e) {
+        console.error('Parse error:', e.message, '\nRaw:', jsonStr.slice(0, 500));
+        throw new Error('JSON parse error: ' + e.message + '. Check browser console for raw output.');
+      }
+
+      if (!Array.isArray(parsed) || !parsed.length) throw new Error('Received an empty list. Try adjusting your ICP and running again.');
+
+      prospects = parsed.map(function(p, i) {
+        return Object.assign({}, p, {id: i, starred: false, stage: 'New'});
+      });
+      prospects.sort(function(a,b){ return b.score - a.score; });
+
+      updateMetrics();
+      renderList();
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('empty-state').style.display = 'none';
+      hideStatus();
+    })
+    .catch(function(err) {
+      setStatus('Error: ' + err.message, true);
+      document.getElementById('empty-state').style.display = 'block';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = 'Re-run agent';
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
